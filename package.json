@@ -1,6 +1,7 @@
 {
   "name": "pour-one-out",
   "version": "0.0.0",
+
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
@@ -11,5 +12,8 @@
     "debug": "~2.0.0",
     "gm": "~1.16.0",
     "bunyan":"~1.0.0"
+  },
+  "engines" : {
+    "node" : ">=0.10.3 <0.12"
   }
 }
