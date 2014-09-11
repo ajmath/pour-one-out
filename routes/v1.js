@@ -11,7 +11,7 @@ var log = bunyan.createLogger({name: "apiV1"});
 router.get('/', function(req, res, next) {
   var whom = req.url.substring(req.url.indexOf('?') + 1, req.url.length);
   whom = unescape(whom);
-  whom = whom.replace("+", " ");
+  whom = whom.replace(/\+/g, " ");
 
   imageMagick(__dirname + '/../public/gifs/liquor.gif')
     .font("Impact.ttf", 70)
