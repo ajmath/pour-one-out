@@ -6,6 +6,7 @@ var gm = require('gm'),
 var bunyan = require('bunyan');
 var log = bunyan.createLogger({name: "apiV1"});
 
+var cache = {};
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -13,18 +14,21 @@ router.get('/', function(req, res, next) {
   whom = unescape(whom);
   whom = whom.replace(/\+/g, " ");
 
-  imageMagick(__dirname + '/../public/gifs/liquor.gif')
-    .font("Impact.ttf", 70)
-    .stroke("black")
-    .strokeWidth(2)
-    .fill("white")
-    .drawText(0, 0, whom, "center")
-    .stream('gif', function (err, stdout, stderr) {
-      if (err) return next(err);
-      res.set('Content-Type', 'image/gif');
-      stdout.pipe(res);
-      stdout.on('error', next);
-    });
+  if (!cache[whom]) {
+    cache[whom] = imageMagick(__dirname + '/../public/gifs/liquor.gif')
+      .font("Impact.ttf", 70)
+      .stroke("black")
+      .strokeWidth(2)
+      .fill("white")
+      .drawText(0, 0, whom, "center");
+  }
+
+  cache[whom].stream('gif', function (err, stdout, stderr) {
+    if (err) return next(err);
+    res.set('Content-Type', 'image/gif');
+    stdout.pipe(res);
+    stdout.on('error', next);
+  });
 });
 
 module.exports = router;
