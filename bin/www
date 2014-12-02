@@ -1,6 +1,13 @@
 #!/usr/bin/env node
+var fs = require('fs');
 var debug = require('debug')('pour-one-out');
 var app = require('../app');
+
+// Setup the cache directory if it doesn't exist
+var cacheDir = process.env.CACHE_DIR || "gif_cache";
+if(!fs.existsSync(cacheDir)) {
+  fs.mkdirSync(cacheDir);
+}
 
 app.set('port', process.env.PORT || 3000);
 
