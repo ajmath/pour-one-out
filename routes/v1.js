@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var ImageGen = require(__dirname + '/../lib/image_generator')
 
 var fs = require('fs');
 var gm = require('gm'),
@@ -8,39 +9,23 @@ var bunyan = require('bunyan');
 var log = bunyan.createLogger({name: "apiV1"});
 var tempfile = require('tempfile');
 
-/* GET users listing. */
 router.get('/', function(req, res, next) {
   var whom = req.url.substring(req.url.indexOf('?') + 1, req.url.length);
   whom = unescape(whom);
   whom = whom.replace(/\+/g, " ");
 
-  var cacheDir = process.env.CACHE_DIR || "gif_cache";
-  var cacheFile = cacheDir + "/" + whom + ".gif";
-  if (!fs.existsSync(cacheFile)) {
-    var tempGif = tempfile('.gif');
-    var file = fs.createWriteStream(tempGif);
-    imageMagick(__dirname + '/../public/gifs/liquor.gif')
-      .font("Impact.ttf", 70)
-      .stroke("black")
-      .strokeWidth(2)
-      .fill("white")
-      .drawText(0, 0, whom, "center")
-      .stream('gif', function (err, stdout, stderr) {
-         if (err) return next(err);
-         res.set('Content-Type', 'image/gif');
-         stdout.pipe(res);
-         stdout.pipe(file);
-         stdout.on('error', next);
-         stdout.on('end', function() {
-           fs.rename(tempGif, cacheFile, function() {
-           });
-         });
-       });
-  } else {
-    var file = fs.createReadStream(cacheFile);
+  var filename = __dirname + '/../public/gifs/liquor.gif';
+  var streamPromise = ImageGen.getAnnotatedImage(whom, filename);
+
+  var annotateWin = function(stream) {
     res.set('Content-Type', 'image/gif');
-    file.pipe(res);
-  }
+    stream.pipe(res);
+  };
+  var annotateFail = function(err) {
+    log.error({err: err}, "Unable to annotate image " + filename + " with text '" + whome + "'");
+    res.send(500, { error: 'something blew up' });
+  };
+  streamPromise.then(annotateWin, annotateFail);
 });
 
 module.exports = router;
