@@ -30,22 +30,24 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.json({
             message: err.message,
-            error: err
+            error: err,
+            prod: false
         });
     });
+} else {
+  // production error handler
+  // no stacktraces leaked to user
+  app.use(function(err, req, res, next) {
+      res.status(err.status || 500);
+      res.json({
+          message: err.message,
+          error: err,
+          prod: true
+      });
+  });
 }
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
 
 
 module.exports = app;
