@@ -12,9 +12,9 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/', v2);
 app.use('/api/v1', v1);
 app.use('/api/v2', v2);
+app.use('/api/', v2);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
