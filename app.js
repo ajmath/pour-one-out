@@ -12,7 +12,7 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/', v1);
+app.use('/api/', v2);
 app.use('/api/v1', v1);
 app.use('/api/v2', v2);
 
